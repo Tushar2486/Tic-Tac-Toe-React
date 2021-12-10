@@ -1,12 +1,30 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import './Board.css';
 
 
 function Board() {
-    const [text, setText] = useState("Play Game");
+    const [text, setText] = useState("");
     const [board, setBoard] = useState(["","","","","","","","",""]);
-    const [player,setPlayer] = useState("X");
+    const [player,setPlayer] = useState("O");
+
+    useEffect(() => {
+        if(isWinning() === true) {
+            setPlayer(prev => "");
+            alert(`Game is over : ${player} Won!`);
+            restart();
+            return;
+        }
+        if(checkDraw() === true) {
+            setPlayer(prev => "");
+            alert("Game Draw");
+            restart();
+            return;
+        }
+        else {
+        setPlayer(player === "X"?"O":"X");
+        }
+      }, [board]);
 
     function isWinning() { 
         if(player !=="" && player===board[0] && board[0] === board[1] && board[1]===board[2]) {
@@ -37,19 +55,27 @@ function Board() {
     }
 
     function checkDraw() {
+        let filled = true;
         board.forEach((curr) => {
-            if(curr==null) {
-            return false;
+            if(curr === "") {
+              filled = false;
             }
-            return true;
+            if(filled)
+            {
+                setText("Game Draw");
+            }
+            else {
+                text === ""?setText("Play Game"):setText(player === "X"?"O turn":"X turn");
+            }
         }
+
         )
     }
 
     function restart() {
         setBoard(["","","","","","","","",""]);
-        setPlayer("X");
-        setText("Play Game");
+        setPlayer("O");
+        setText("");
     }
 
     function blockClick(index) {
@@ -61,30 +87,10 @@ function Board() {
             boardCopy[index] = player;
             setBoard(boardCopy);
         }
-        else {
-            console.log("Already Filled Block");
-        }
-        
-        if(isWinning()===true) {
-            setPlayer(prev => "");
-            alert(`Game is over : ${player} Won!`);
-            restart();
-            return;
-        }
-        if(checkDraw()===true) {
-            setPlayer(prev => "");
-            setText("Draw");
-            alert("Game Draw");
-            restart();
-        }
-        else{
-        setPlayer(player === "X"?"O":"X");
-        setText(player === "X"?"O turn":"X turn");
-        }
     }
-        console.log(board);
+    
     return (
-        <div>
+        <>
             <div className="container">
             <div className="board">
             <div className="box" id="0" style={{borderLeft:"none",borderTop:"none"}} onClick = {() => {
@@ -118,7 +124,7 @@ function Board() {
             <h1 id="text">{isWinning()?`${player} Won!`:`${text}`}</h1>
 	        <button id="restart" onClick={restart}>Restart</button>
             </div>
-        </div>
+        </>
         
     )
 }
